@@ -8,7 +8,7 @@ int ball_number = 5;
 int ball_circle = 10;
 int tube_number = 25;
 int tube_circle = 7;
-float test_radius = 9;
+float test_radius = 13;
 
 class Ball
 {
@@ -323,8 +323,11 @@ class Tube
   
    void GenerateFirstTri()
     {
-      firstTri = new Triangle(tube_vertices.get(0).get(0),tube_vertices.get(0).get(1),tube_vertices.get(1).get(1));
-      firstTri.normal = tube_normal.get(0).get(0);
+      int i = int(tube_vertices.size() / 2.0f);
+      int j = int(tube_vertices.get(i).size() / 2.0f);
+      
+      firstTri = new Triangle(tube_vertices.get(i).get(j),tube_vertices.get(i).get(j + 1),tube_vertices.get(i + 1).get(j + 1));
+      firstTri.normal = tube_normal.get(i).get(j);
     }
   
 }

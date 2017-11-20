@@ -115,9 +115,10 @@ void draw() {
       println(vertices.size());*/
      // test.Render();    
          Render_TriMesh(false,false);
-         fill(green);
          BallPivot_Init();
          BallPivot(vertices);
+         stroke(1);
+         fill(green);
          Render_BallPivot();  
     }
     else if(choice == 5)
@@ -126,11 +127,12 @@ void draw() {
        fill(green); Q.drawBalls(rb);  
        fill(red,100); R.showPicked(rb+5);
      
+       
+       
        Render_TriMesh(false,false);
-       fill(green);
-         
        BallPivot_Init();
          //test
+       fill(green);
        BallPivot(test_vertex);
        Render_BallPivot();  
     }

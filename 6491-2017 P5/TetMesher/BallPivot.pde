@@ -17,10 +17,9 @@ Queue<Triangle> pendingTriangles = new LinkedList<Triangle>(); // Store the tria
 void BallPivot_Init()
 {
   
-final_triangle.clear();
+  final_triangle.clear();
 test_vertex.clear();
 visited_edge.clear();
-
 
 //final_triangle.add(firstTri);
 // First Triangle to be 'Ball pivoted'

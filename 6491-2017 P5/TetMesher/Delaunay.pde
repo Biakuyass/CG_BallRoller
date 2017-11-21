@@ -1,6 +1,9 @@
 class Triangle
 {
   pt a,b,c;
+  
+  int ai,bi,ci;
+  
   vec normal;
   Triangle(pt a_,pt b_,pt c_)
   { 
@@ -61,6 +64,14 @@ int [] indices_Q;
 //Init indices and the huge triangle to calculate Delaunay on the plane
 void Init()
 {
+  for(int i = 0; i < P.nv;i++)
+ {
+  P.G[i].z = h_floor;
+ }
+ for(int i = 0; i < Q.nv;i++)
+ {
+  Q.G[i].z = h_ceiling;
+ }
    edge_floor.clear();
    edge_ceiling.clear();
    tetrahedron.clear();

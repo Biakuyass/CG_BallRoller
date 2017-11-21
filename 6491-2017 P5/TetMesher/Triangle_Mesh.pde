@@ -1,7 +1,8 @@
 
 
 ArrayList<pt> vertices = new ArrayList<pt>();
-ArrayList<vec> vertex_normal = new ArrayList<vec>();
+ArrayList<ArrayList<vec>> precise_normal = new ArrayList<ArrayList<vec>>();
+ArrayList<vec> vertex_dir = new ArrayList<vec>(); // direction to the outside(inprecise)
 Triangle firstTri;
 
 
@@ -76,7 +77,9 @@ class Ball
        //  beam(temp_vertex,test,rm);
          
          vertices.add(temp_vertex);
-         vertex_normal.add(temp_normal);
+         vertex_dir.add(temp_normal);
+         ArrayList<vec> preNormals = new ArrayList<vec>();
+         precise_normal.add(preNormals);
       }
     }
   }
@@ -110,9 +113,9 @@ class Ball
         ball_normal_b.get(i).add(temp_normal);
         
         vertices.add(temp_vertex);
-        vertex_normal.add(temp_normal);
-       //  pt test = P(a,10,temp_normal);
-       //  beam(temp_vertex,test,rm);
+        vertex_dir.add(temp_normal);
+        ArrayList<vec> preNormals = new ArrayList<vec>();
+        precise_normal.add(preNormals);
       }
     }
   }
@@ -242,7 +245,9 @@ class Tube
         tube_normal.get(i).add(temp_normal);
         
         vertices.add(temp_vertex);
-        vertex_normal.add(temp_normal);
+        vertex_dir.add(temp_normal);
+        ArrayList<vec> preNormals = new ArrayList<vec>();
+        precise_normal.add(preNormals);
       }
     }
   }
@@ -323,10 +328,53 @@ class Tube
       int j = int(tube_vertices.get(i).size() / 2.0f);
       
       firstTri = new Triangle(tube_vertices.get(i).get(j),tube_vertices.get(i).get(j + 1),tube_vertices.get(i + 1).get(j + 1));
-      firstTri.normal = tube_normal.get(i).get(j);
+      //firstTri.normal = tube_normal.get(i).get(j);
+      
+      int ai = find_vertexId(tube_vertices.get(i).get(j),vertices);
+      int bi = find_vertexId(tube_vertices.get(i).get(j + 1),vertices);
+      int ci = find_vertexId(tube_vertices.get(i + 1).get(j + 1),vertices);
+      
+      firstTri.ai = ai;
+      firstTri.bi = bi;
+      firstTri.ci = ci;
+      
+      vec AB = V(firstTri.a,firstTri.b);
+      vec AC = V(firstTri.a,firstTri.c);
+      
+      vec temp_normal = U(cross(AB,AC));
+      if(dot(temp_normal,tube_normal.get(i).get(j)) < 0)
+      {
+        temp_normal = V(-1,temp_normal);
+      }
+      firstTri.normal = temp_normal;
     }
   
 }
+
+int find_vertexId(pt a,ArrayList<pt> vertex)
+{
+  int id = -1;
+  for(int i = 0; i < vertex.size();i++)
+  {
+    if(SameVertex(a,vertex.get(i)))
+    {
+      id = i;
+      break;
+    }
+    
+  }
+  return id;
+}
+boolean SameVertex(pt a, pt b)
+{
+  if(abs(a.x - b.x) < 0.001f && abs(a.y - b.y) < 0.001f && abs(a.z - b.z) < 0.001f)
+  return true;
+  else
+  return false;
+
+}
+
+
 
 void Render_TriMesh(boolean stroke,boolean render)
 {

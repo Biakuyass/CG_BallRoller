@@ -4,11 +4,7 @@ ArrayList<pt> vertices = new ArrayList<pt>();
 ArrayList<vec> vertex_normal = new ArrayList<vec>();
 Triangle firstTri;
 
-int ball_number = 5;
-int ball_circle = 10;
-int tube_number = 25;
-int tube_circle = 7;
-float test_radius = 13;
+
 
 class Ball
 {
@@ -334,7 +330,7 @@ class Tube
 
 void Render_TriMesh(boolean stroke,boolean render)
 {
-  vertices.clear();
+  
   if(stroke)
   {
     stroke(1);

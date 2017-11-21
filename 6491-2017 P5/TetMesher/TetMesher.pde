@@ -31,7 +31,11 @@ float defectAngle=0;
 pts P = new pts(); // polyloop in 3D
 pts Q = new pts(); // second polyloop in 3D
 pts R, S; 
-    
+
+int count = 0;
+int size_record = 1;
+boolean complete_flag = false;
+
 
 void setup() {
   myFace = loadImage("data/pic.jpg");  // load image from file pic.jpg in folder data *** replace that file with your pic of your own face
@@ -48,6 +52,7 @@ void setup() {
   }
 int test = 0;
 void draw() {
+  
  // lights();
   background(255);
   hint(ENABLE_DEPTH_TEST); 
@@ -75,6 +80,7 @@ void draw() {
    // fill(red,100); R.showPicked(rb+5); 
     }
  // Prepare for Delaunay calculation
+ 
     Init();
     // Calculate Dalaunay triangles(Floor)
     Init_Floor();
@@ -93,29 +99,28 @@ void draw() {
      fill(green); Q.drawBalls(rb);  
      fill(red,100); R.showPicked(rb+5); 
      Render();
+     buffer_reset();
     }
     else if(choice == 2) // Generate and the vertices of the tubes and balls and render the triangle mesh with stroke
-    Render_TriMesh(true,true);
+    {
+      buffer_reset();
+      Render_TriMesh(true,true);
+    }
+    
     else if(choice == 3) //
     {
+      buffer_reset();
       Render_TriMesh(false,true); // Generate and the vertices of the tubes and balls and render the triangle mesh without stroke 
-      /*Tube test = new Tube(Q.G[0],P.G[0]);
-      test.Generate_Tube();
-      test.Generate_Ball();
-      stroke(1);
-      test.Render();*/
     }
     else if(choice == 4 )
     {
-      //For test
-      /*vertices.clear();
-      Tube test = new Tube(Q.G[0],P.G[0]);
-      test.Generate_Tube();
-      test.GenerateFirstTri();
-      println(vertices.size());*/
-     // test.Render();    
-         Render_TriMesh(false,false);
-         BallPivot_Init();
+       if(pendingTriangles.size() <= 0 && !complete_flag)
+       {
+        
+       BallPivot_Clear();
+       Render_TriMesh(false,false);
+       BallPivot_Init();
+       }
          BallPivot(vertices);
          stroke(1);
          fill(green);
@@ -126,15 +131,18 @@ void draw() {
        fill(orange); P.drawBalls(rb);
        fill(green); Q.drawBalls(rb);  
        fill(red,100); R.showPicked(rb+5);
-     
        
+       pendingTriangles.clear();
        
+       BallPivot_Clear();
        Render_TriMesh(false,false);
        BallPivot_Init();
          //test
        fill(green);
        BallPivot(test_vertex);
        Render_BallPivot();  
+       
+       buffer_reset();
     }
     
 

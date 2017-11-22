@@ -1,8 +1,13 @@
 
 
+// Vertices for ball pivoting
 ArrayList<pt> vertices = new ArrayList<pt>();
+// normal of each vertex
 ArrayList<ArrayList<vec>> precise_normal = new ArrayList<ArrayList<vec>>();
-ArrayList<vec> vertex_dir = new ArrayList<vec>(); // direction to the outside(inprecise)
+// direction to the outside(inprecise) for each vertex
+ArrayList<vec> vertex_dir = new ArrayList<vec>(); 
+
+//First Triangle to add in the array
 Triangle firstTri;
 
 
@@ -63,7 +68,7 @@ class Ball
      float delta_angle = 2 * PI / (number - 1);
      float radius = sqrt(1 - t * t) * rb;
      
-      for(int j = 0; j < number;j++)
+      for(int j = 0; j < number - 1;j++)
       {
         vec dir = U(R(start_dir,delta_angle * j,dir_x,dir_y));
         dir = V(radius,dir);
@@ -102,14 +107,14 @@ class Ball
      float delta_angle = 2 * PI / (number - 1);
      float radius = sqrt(1 - t * t) * rb;
      
-      for(int j = 0; j < number;j++)
+      for(int j = 0; j < number - 1;j++)
       {
         vec dir = U(R(start_dir,delta_angle * j,dir_x,dir_y));
         dir = V(radius,dir);
         pt temp_vertex = P(center,dir);
         ball_vertices_b.get(i).add(temp_vertex);
         
-        vec temp_normal = U(V(temp_vertex,a));
+        vec temp_normal = U(V(a,temp_vertex));
         ball_normal_b.get(i).add(temp_normal);
         
         vertices.add(temp_vertex);
@@ -234,7 +239,7 @@ class Tube
      float delta_angle = 2 * PI / (number - 1);
      
      
-      for(int j = 0; j < number;j++)
+      for(int j = 0; j < number - 1;j++)
       {
         vec dir = U(R(start_dir,delta_angle * j,dir_x,dir_y));
         dir = V(rb,dir);
@@ -347,6 +352,11 @@ class Tube
         temp_normal = V(-1,temp_normal);
       }
       firstTri.normal = temp_normal;
+      
+      precise_normal.get(ai).add(firstTri.normal);
+      precise_normal.get(bi).add(firstTri.normal);
+      precise_normal.get(ci).add(firstTri.normal);
+      
     }
   
 }
@@ -388,6 +398,19 @@ void Render_TriMesh(boolean stroke,boolean render)
   {
     noStroke();
   }
+ /* Tube test = new Tube(Q.G[0],P.G[0]);
+  test.Generate_Tube();
+  test.GenerateFirstTri();
+  
+  Ball b1 = new Ball();
+  b1.a = Q.G[0];
+  b1.Generate_BallA();
+  b1.Generate_BallB();
+  
+  Ball b2 = new Ball();
+  b2.a = P.G[0];
+  b2.Generate_BallA();
+  b2.Generate_BallB();*/
 
   fill(red);
   //fill(orange);
@@ -448,7 +471,7 @@ void Render_TriMesh(boolean stroke,boolean render)
     
   }
   
-  println(vertices.size());
+  //println(vertices.size());
 
 }
  

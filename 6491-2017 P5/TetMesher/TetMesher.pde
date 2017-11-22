@@ -73,6 +73,7 @@ void draw() {
   // Calculate Delauney in 3D space
   Delaunay_3D();
 
+    
   //Delaunay Triangle without ball pivot
   if (choice == 1)
   {
@@ -87,12 +88,12 @@ void draw() {
     buffer_reset();
   } else if (choice == 2) // Generate and the vertices of the tubes and balls and render the triangle mesh with stroke
   {
-    buffer_reset();
-    Render_TriMesh(true, true);
+   // buffer_reset();
+    //Render_TriMesh(true, true);
   } else if (choice == 3) 
   {
-    buffer_reset();
-    Render_TriMesh(false, true); // Generate and the vertices of the tubes and balls and render the triangle mesh without stroke
+   // buffer_reset();
+   // Render_TriMesh(false, true); // Generate and the vertices of the tubes and balls and render the triangle mesh without stroke
   } else if (choice == 4 )
   {
     if (pendingTriangles.size() <= 0 && !complete_flag)

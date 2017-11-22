@@ -92,7 +92,7 @@ public pt pick(float mX, float mY, float mZ) {
     
     translate(0,0,dz); // puts origin of model at screen center and moves forward/away by dz
     lights();  // turns on view-dependent lighting
-    //directionalLight(255, 255, 126, 1, 1, 0);
+   // directionalLight(255, 255, 126, 1, 1, 0);
     rotateX(rx); rotateY(ry); // rotates the model around the new origin (center of screen)
     rotateX(PI/2); // rotates frame around X to make X and Y basis vectors parallel to the floor
     if(center) translate(-F.x,-F.y,-F.z);  // center the focus on F

@@ -8,7 +8,7 @@ int tube_number = 25;
 int tube_circle = 7;
 
 //ball radius = the radius of the circumcircle of first triangle + test_radius
-float test_radius = 25;
+float test_radius = 20;
 float ball_radius;
 pt absolute_center;
 
@@ -102,13 +102,7 @@ void BallPivot(ArrayList<pt> vertex)
   }
 }
 
-void Render_BallPivot()
-{
-  for (int i = 0; i < final_triangle.size(); i++)
-  {
-    RenderTriangle(final_triangle.get(i));
-  }
-}
+
 
 // Rotate the ball to next vertex . tri : the original triangle, e : the rotate axis(an edge of the triangle),third_vertex: tri - e, vertex: the vertices array, radius : radius of the ball, abscenter: haven't been used now
 void NextTriangle(Triangle tri, Edge e, pt third_vertex, ArrayList<pt> vertex, float radius, pt abscenter,int ai_,int bi_)
@@ -138,6 +132,9 @@ void NextTriangle(Triangle tri, Edge e, pt third_vertex, ArrayList<pt> vertex, f
       
     // if the radius of the triangle is larger the sphere radius, skip it
     Triangle test_tri = new Triangle(e.a, e.b, np);
+    test_tri.ai = ai_;
+    test_tri.bi = bi_;
+    test_tri.ci = i;
     float test_radius = CircleTri_radius(test_tri);
     
     if (test_radius > radius)
@@ -148,7 +145,7 @@ void NextTriangle(Triangle tri, Edge e, pt third_vertex, ArrayList<pt> vertex, f
     if (choice == 5)
       outside_vector2 = V(abscenter, temp_circlecenter);
     else
-      outside_vector2 = Triangle_normal(ai_,bi_,i);
+      outside_vector2 = Triangle_normal(test_tri);
 
     //cirlce of a triangle with the edge and the new point
     pt np_center = SphereCenter(e.a, e.b, np, radius, outside_vector2);
@@ -182,10 +179,15 @@ void NextTriangle(Triangle tri, Edge e, pt third_vertex, ArrayList<pt> vertex, f
 
     if (choice == 4)
     {
-      temp_tri.normal = Triangle_normal(ai_,bi_,record);
       temp_tri.ai = ai_;
       temp_tri.bi = bi_;
       temp_tri.ci = record;
+      temp_tri.normal = Triangle_normal(temp_tri);
+
+      
+      precise_normal.get(temp_tri.ai).add(temp_tri.normal);
+      precise_normal.get(temp_tri.bi).add(temp_tri.normal);
+      precise_normal.get(temp_tri.ci).add(temp_tri.normal);
     }
       
 
@@ -234,43 +236,280 @@ boolean IsTriangleVertex(Triangle tri, pt vertex)
 
 void RenderTriangle(Triangle tri)
 {
-  beginShape();
-  //   normal(normals.get(i).get(j));
+
+  if(choice == 4)
+  {
+  vec nora = getNormal(tri.ai);
+  vec norb = getNormal(tri.bi);
+  vec norc = getNormal(tri.ci);
+  
+    beginShape();
+  normal(nora);
   vertex(tri.a);
-
-  //   normal(normals.get(i).get(next_j));
+  normal(norb);
   vertex(tri.b);
-
-  //   normal(normals.get(i + 1).get(next_j));
+  normal(norc);
   vertex(tri.c);
+  }
+  else
+  {
+   beginShape();
+  vertex(tri.a);
+  vertex(tri.b);
+  vertex(tri.c);
+  }
 
-  endShape();
+  
+  /*if(dot(nora,norb) < 0)
+  println("Normal Error");*/
+  //nora = Triangle_normal(tri);
+  //norb = V(-1,nora);
+  //vec nor = V(-1,tri.normal);
+  
+
+
+
+
+     
+  endShape(CLOSE);
+}
+
+void Render_BallPivot()
+{
+  //println(vertices.size());
+ // println(precise_normal.get(final_triangle.get(0).ai).size());
+  //int t = 3;
+ // int n = final_triangle.size() > t? t :final_triangle.size();
+ // beginShape(TRIANGLES);
+  for (int i = 0; i < final_triangle.size();i++)
+  {
+    RenderTriangle(final_triangle.get(i));
+  }
+ // endShape();
 }
 
 void buffer_reset()
 {
+  for(int i = 0; i < precise_normal.size();i++)
+    precise_normal.get(i).clear();
+  precise_normal.clear();
   vertices.clear();
+  vertex_dir.clear();
   pendingTriangles.clear();
   complete_flag = false;
 }
 
-
-vec Triangle_normal(int ai,int bi,int ci)
+vec getNormal(int i)
 {
+  vec result = new vec(0,0,0);
+  int n = precise_normal.get(i).size();
+  for(int j = 0; j < n; j++)
+  {
+    result = A(result,U(precise_normal.get(i).get(j)));
+  }
+  result = U(result);
+  
+  if(norm(result) <= 0.001f)
+  println("Error");
+  
+  
+ // pt a = vertices.get(i);
+ // pt b = P(a,10,result);
+ // fill(red);
+ // noStroke();
+  
+  //beam(a,b,rm);
+ // stroke(1);
+ // fill(green);
+ // result = V(-1,result);
+  return result;
+  
+  
+}
+vec Triangle_normal(Triangle tri)
+{
+  int ai = tri.ai;
+  int bi = tri.bi;
+  int ci = tri.ci;
+  
   vec vecNormal = new vec();
   
-  vec dir = vertex_dir.get(ci);
-  pt A = vertices.get(ai);
-  pt B = vertices.get(bi);
-  pt C = vertices.get(ci);
+  vec dira = vertex_dir.get(ai);
+  vec dirb = vertex_dir.get(bi);
+  vec dirc = vertex_dir.get(ci);
+  vec dir = A(U(dira),U(dirb));
+  dir = A(U(dirc),dir);
+  dir = U(dir);
+  
+  
+  
+  pt A = tri.a;
+  pt B = tri.b;
+  pt C = tri.c;
   
   vec AB = V(A,B);
   vec AC = V(A,C);
   
+  /*vec CA = V(C,A);
+  vec CB = V(C,B);*/
+  
   vecNormal = U(cross(AB,AC));
-  if(dot(vecNormal,dir) < 0)
+  
+  if(dot(vecNormal,dir) < -0.01f)
   {
     vecNormal = V(-1,vecNormal);
+    
+    pt temp_pt = tri.b;
+    tri.b = tri.c;
+    tri.c = temp_pt;
+    
+    int temp_i = tri.bi;
+    tri.bi = tri.ci;
+    tri.ci = temp_i; 
   }
+  
   return vecNormal;
 }
+/*boolean clockwise(Triangle tri)
+{
+  boolean flag = false;
+  pt p1 = P(tri.a);
+  pt p2 = P(tri.b);
+  pt p3 = P(tri.c);
+  
+  vec v1 = V(p1,p2);
+  vec v2 = V(p2,p3);
+  vec v3 = V(p3,p1);
+  
+  int ai,bi,ci;
+  
+  ai = tri.ai;
+  bi = tri.bi;
+  ci = tri.ci;
+  // A,B,C
+  if(!flag && !cw(v1,v2,v3))
+  {
+    p1 = P(tri.a);
+    p2 = P(tri.c);
+    p3 = P(tri.b);
+    
+    ai = tri.ai;
+    bi = tri.ci;
+    ci = tri.bi;
+  }
+  else
+  {
+    flag = true;
+  }
+  // A,C,B
+  v1 = V(p1,p2);
+  v2 = V(p2,p3);
+  v3 = V(p3,p1);
+  
+  if(!flag && !cw(v1,v2,v3))
+  {
+    p1 = P(tri.b);
+    p2 = P(tri.a);
+    p3 = P(tri.c);
+    
+    ai = tri.bi;
+    bi = tri.ai;
+    ci = tri.ci; 
+  }
+  else
+  {
+    flag = true;
+  }
+  
+  // B,A,C
+  v1 = V(p1,p2);
+  v2 = V(p2,p3);
+  v3 = V(p3,p1);
+  
+  if(!flag && !cw(v1,v2,v3))
+  {
+    p1 = P(tri.b);
+    p2 = P(tri.c);
+    p3 = P(tri.a);
+    
+    ai = tri.bi;
+    bi = tri.ci;
+    ci = tri.ai; 
+  }
+  else
+  {
+    flag = true;
+  }
+  
+  // B,C,A
+  v1 = V(p1,p2);
+  v2 = V(p2,p3);
+  v3 = V(p3,p1);
+  
+  if(!flag && !cw(v1,v2,v3))
+  {
+    p1 = P(tri.c);
+    p2 = P(tri.a);
+    p3 = P(tri.b);
+    
+    ai = tri.ci;
+    bi = tri.ai;
+    ci = tri.bi; 
+  }
+  else
+  {
+    flag = true;
+  }
+  
+  // C,A,B
+  v1 = V(p1,p2);
+  v2 = V(p2,p3);
+  v3 = V(p3,p1);
+  
+  if(!flag && !cw(v1,v2,v3))
+  {
+    p1 = P(tri.c);
+    p2 = P(tri.b);
+    p3 = P(tri.a);
+    
+    ai = tri.ci;
+    bi = tri.bi;
+    ci = tri.ai; 
+  }
+  else
+  {
+    flag = true;
+  } 
+  
+  // C,B,A
+  v1 = V(p1,p2);
+  v2 = V(p2,p3);
+  v3 = V(p3,p1);
+  
+  if(!flag && !cw(v1,v2,v3))
+  {
+    println("ClockWise Error");
+  }
+  else
+  {
+    flag = true;
+  }
+  
+  if(flag)
+  {
+    
+    println("ClockWise Succ");
+    tri.a = p1;
+    tri.b = p2;
+    tri.c = p3;
+    
+    tri.ai = ai;
+    tri.bi = bi;
+    tri.ci = ci;
+    return true;
+  }
+  else
+  return false;
+  
+  
+}*/
